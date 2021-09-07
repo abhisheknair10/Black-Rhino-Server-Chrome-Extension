@@ -11,3 +11,9 @@ app.get('/main', (req, res) => {
     const ret_arr = [nano.toString(), usd.toString()];
     res.send(ret_arr);
 })
+
+//-----------------------------------------------------------------------------
+
+app.listen(port, () => {
+    console.log('Server is up on port ' +port)
+})
