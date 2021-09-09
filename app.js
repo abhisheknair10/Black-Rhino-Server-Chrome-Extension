@@ -3,7 +3,19 @@ const express = require('express')
 const app = express()
 const port = process.env.PORT || 3000
 var sha256 = require('js-sha256');
-var pg = require('pg');
+var pgp = require('pg-promise');
+
+//-----------------------------------------------------------------------------
+
+const cn = {
+    host: "black-rhino-do-user-9771361-0.b.db.ondigitalocean.com",
+    port: 25060,
+    database: "main-user-data",
+    user: "doadmin",
+    password: "nntzloZkFtuvP7xm"
+};
+
+const db = pgp(cn);
 
 //-----------------------------------------------------------------------------
 
