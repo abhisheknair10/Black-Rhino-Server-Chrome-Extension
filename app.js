@@ -8,11 +8,11 @@ var pgp = require('pg-promise');
 //-----------------------------------------------------------------------------
 
 const cn = {
-    host: "black-rhino-do-user-9771361-0.b.db.ondigitalocean.com",
+    host: "black-rhino-main-do-user-9771361-0.b.db.ondigitalocean.com",
     port: 25060,
     database: "main-user-data",
     user: "doadmin",
-    password: "nntzloZkFtuvP7xm"
+    password: "jlcrRotdiNh0X5vb"
 };
 
 const db = pgp(cn);
