@@ -7,15 +7,7 @@ var pgp = require('pg-promise');
 
 //-----------------------------------------------------------------------------
 
-const cn = {
-    host: "black-rhino-main-do-user-9771361-0.b.db.ondigitalocean.com",
-    port: 25060,
-    database: "main-user-data",
-    user: "doadmin",
-    password: "jlcrRotdiNh0X5vb"
-};
 
-const db = pgp(cn);
 
 //-----------------------------------------------------------------------------
 
@@ -55,13 +47,11 @@ function generateUser(){
 
 app.set("view engine", "ejs");
 
-app.get('/main/*', (req, res) => {
-    url = req.url;
-    var username = url.split("main/")[1].split("/")[4];
-    var secret_hash = url.split("main/")[1].split("/")[5];
+app.get('/main/:username/:secret_hash', (req, res) => {
+    var username = req.params.username;
+    var secret_hash = req.params.secret_hash;
     var nano = financial(1);
-    var usd = financial(nano * 6.7);
-    res.send(username + "<>" + secret_hash);
+    res.send(nano);
     res.end();
 });
 
