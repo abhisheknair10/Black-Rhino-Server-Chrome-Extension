@@ -3,7 +3,7 @@ const express = require('express')
 const app = express()
 const port = process.env.PORT || 3000
 var sha256 = require('js-sha256');
-var pgp = require('pg-promise');
+var pgp = require('pg');
 
 //-----------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ app.set("view engine", "ejs");
 app.get('/main/:username/:secret_hash', (req, res) => {
     var username = req.params.username;
     var secret_hash = req.params.secret_hash;
-    var nano = financial(1);
+    var nano = financial(1);g
     res.send(nano);
     res.end();
 });
