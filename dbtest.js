@@ -8,7 +8,7 @@ const pool = new Pool({
 })
 pool.connect()
 
-pool.query(`Select * from mainuserdata`, (err, res)=>{
+pool.query(`SELECT * FROM mainuserdata`, (err, res)=>{
     if(!err){
         console.log(res.rows);
     }
