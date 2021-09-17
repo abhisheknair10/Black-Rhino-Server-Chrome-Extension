@@ -60,11 +60,22 @@ function generateUser(){
 app.set("view engine", "ejs");
 
 app.get('/main/:username/:secret_hash', (req, res) => {
-    var username = req.params.username;
-    var secret_hash = req.params.secret_hash;
-    var nano = financial(1);
-    res.send(nano);
-    res.end();
+    const getUserData = async () => {
+        var username = req.params.username;
+        var secret_hash = req.params.secret_hash;
+        var result = await pool.query(`SELECT * FROM mainuserdata WHERE username = $1;`, [username]);
+        if(result.rows[0].shahash == secret_hash){
+            var nano = financial(result.rows[0].nano);
+            console.log(nano)
+            res.send(nano);
+            res.end();
+        }
+        else{
+            res.send("ID Not Validated");
+            res.end();
+        }
+    }
+    getUserData()
 });
 
 app.get('/newuser/generateuser-request', (req, res) => {
