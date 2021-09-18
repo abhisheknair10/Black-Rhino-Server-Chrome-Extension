@@ -34,7 +34,7 @@ const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678
 function generateString(length) {
     let result = '';
     const charactersLength = characters.length;
-    for ( let i = 0; i < length; i++ ) {
+    for ( let i = 0; i < length; i++) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
@@ -83,7 +83,7 @@ app.get('/newuser/generateuser-request', (req, res) => {
         global.new_user = generateUser();
         new_username = new_user.split("<>")[0];
         new_secret_hash = new_user.split("<>")[1];
-        
+
         var result = await pool.query(`SELECT * FROM mainuserdata WHERE username = $1;`, [new_username]);
         if(result.rows == ""){
             console.log("User Does Not Exists")
@@ -101,9 +101,30 @@ app.get('/newuser/generateuser-request', (req, res) => {
     connToDatabase()
 });
 
+app.get('/recover/account/:username/:hash', (req, res) => {
+    const recoverAccount = async () => {
+        var username = req.params.username;
+        var secret_hash = req.params.hash;
+
+        var result = await pool.query(`SELECT * FROM mainuserdata WHERE username = $1;`, [username]);
+        try{
+            if(secret_hash == result.rows[0].shahash){
+                res.send("200");
+            }
+        }
+        catch(error){
+            console.log(error)
+            res.send("1000")
+        }
+    }
+    recoverAccount()
+});
+
+app.get('/withdraw/:username/:hash/:walletaddr/:amount', (req, res) => {
+});
 
 //-----------------------------------------------------------------------------
 
 app.listen(port, () => {
-    console.log('Server is up on port ' +port)
+    console.log('Server is up on port ' + port)
 })
