@@ -2,9 +2,9 @@ const path = require('path')
 const express = require('express')
 const app = express()
 const port = process.env.PORT || 3000
-var sha256 = require('js-sha256');
-const fs = require("fs");
-const { Pool } = require('pg');
+var sha256 = require('js-sha256')
+const fs = require("fs")
+const { Pool } = require('pg')
 
 //-----------------------------------------------------------------------------
 
@@ -65,9 +65,9 @@ app.get('/main/:username/:secret_hash', (req, res) => {
         var secret_hash = req.params.secret_hash;
         var result = await pool.query(`SELECT * FROM mainuserdata WHERE username = $1;`, [username]);
         if(result.rows[0].shahash == secret_hash){
-            var nano = financial(result.rows[0].nano);
-            console.log(nano)
-            res.send(nano);
+            var xlm = financial(result.rows[0].xlm);
+            console.log(xlm)
+            res.send(xlm);
             res.end();
         }
         else{
@@ -80,7 +80,7 @@ app.get('/main/:username/:secret_hash', (req, res) => {
 
 app.get('/newuser/generateuser-request', (req, res) => {
     const connToDatabase = async () => {
-        global.new_user = generateUser();
+        new_user = generateUser();
         new_username = new_user.split("<>")[0];
         new_secret_hash = new_user.split("<>")[1];
 
@@ -110,11 +110,16 @@ app.get('/recover/account/:username/:hash', (req, res) => {
         try{
             if(secret_hash == result.rows[0].shahash){
                 res.send("200");
+                res.end();
+            }
+            else{
+                res.send("1000");
             }
         }
         catch(error){
             console.log(error)
-            res.send("1000")
+            res.send("1000");
+            res.end();
         }
     }
     recoverAccount()
