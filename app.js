@@ -126,6 +126,18 @@ app.get('/recover/account/:username/:hash', (req, res) => {
 });
 
 app.get('/withdraw/:username/:hash/:walletaddr/:amount', (req, res) => {
+    res.send("Ha")
+    res.end()
+});
+
+app.get('/hints/:username', (req, res) => {
+    const hints = async () => {
+        var username = req.params.username;
+        var result = await pool.query(`SELECT * FROM mainuserdata WHERE username = $1;`, [username]);
+        result = result.rows[0];
+        
+    }
+    hints()
 });
 
 //-----------------------------------------------------------------------------
