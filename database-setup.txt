@@ -1,0 +1,36 @@
+/*
+INSERT INTO mainuserdata VALUES ('user2324539745', '688787d8ff144c502c7f5cffaafe2cc588d86079f9de88304c26b0cb99ce91c6', 23.23, '12451');
+
+SELECT * FROM mainuserdata;
+
+
+CREATE TABLE mainuserdata (
+	username TEXT NOT NULL,
+	shahash TEXT NOT NULL,
+	nano FLOAT(2) NOT NULL,
+	ads INT8 []
+)
+
+DELETE FROM mainuserdata WHERE username = 'user4170140025';
+
+CREATE TABLE ads (
+	adid INT8 NOT NULL,
+	advertname TEXT NOT NULL,
+	adurl TEXT NOT NULL,
+	adhint TEXT NOT NULL,
+	purchaseprice FLOAT8 NOT NULL,
+	tiers INT8 [] NOT NULL,
+	tierscompleted INT8 []
+)
+*/
+
+CREATE TABLE ads (
+	adid INT8 NOT NULL,
+	advertname TEXT NOT NULL,
+	adurl TEXT NOT NULL,
+	adhint TEXT NOT NULL,
+	purchaseprice FLOAT8 NOT NULL,
+	tiers INT8 [] NOT NULL,
+	tiernopeople INT8 [] NOT NULL,
+	tierscompleted INT8 []
+)

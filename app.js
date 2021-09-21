@@ -88,7 +88,7 @@ app.get('/newuser/generateuser-request', (req, res) => {
         if(result.rows == ""){
             console.log("User Does Not Exists")
             console.log(result.rows);
-            var postToDatabase = await pool.query(`INSERT INTO mainuserdata VALUES ($1, $2, $3, $4);`, [new_username, new_secret_hash, 0.00, null]);
+            var postToDatabase = await pool.query(`INSERT INTO mainuserdata VALUES ($1, $2, $3, $4);`, [new_username, new_secret_hash, 0.00, []]);
         }
         else{
             new_user = "userfound";
@@ -133,9 +133,20 @@ app.get('/withdraw/:username/:hash/:walletaddr/:amount', (req, res) => {
 app.get('/hints/:username', (req, res) => {
     const hints = async () => {
         var username = req.params.username;
-        var result = await pool.query(`SELECT * FROM mainuserdata WHERE username = $1;`, [username]);
-        result = result.rows[0];
-        
+        var adsresult = await pool.query(`SELECT * FROM ads;`);
+        var userresult = await pool.query(`SELECT * FROM mainuserdata WHERE username = $1`, [username]);
+        var ret_array = []
+        for (let i = 0; i < adsresult.rows.length; i++) {
+            if(userresult.rows[0].ads.includes(adsresult.rows[i].adid)){
+            }
+            else{
+                ret_array.push(adsresult.rows[i].adhint)
+                ret_array.push("<>")
+            }
+        }
+        console.log(ret_array)
+        res.send(ret_array.join(''))
+        res.end()
     }
     hints()
 });
