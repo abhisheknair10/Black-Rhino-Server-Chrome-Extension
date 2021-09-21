@@ -59,6 +59,57 @@ function generateUser(){
 
 app.set("view engine", "ejs");
 
+app.get('/checkurl/:username/:theurl', (req, res) => {
+    const queryurl = async () => {
+        var username = req.params.username
+        var theurl = req.params.theurl
+        theurl = theurl.split('-').join('/')
+        console.log(theurl)
+
+        var result = await pool.query(`SELECT * FROM ads WHERE adurl = $1;`, [theurl]);
+        if(result.rows[0] == null){
+            console.log("This Website is not Advertised on Black Rhino")
+        }
+        else{
+            console.log("This Website is Advertised on Black Rhino")
+            var userresult = await pool.query(`
+            SELECT * FROM mainuserdata WHERE username = $1;`, [username]);
+            if(userresult.rows[0].ads.includes(result.rows[0].adid)){
+            }
+            else{
+                appended_arr = userresult.rows[0].ads
+                appended_arr.push(result.rows[0].adid)
+                var appenddb = await pool.query(`
+                UPDATE mainuserdata SET ads = $1 WHERE username = $2;`, [appended_arr, username])
+                if(result.rows[0].tierscompleted[0] < result.rows[0].targetpeople[0]){
+                    var updateuserxlm = await pool.query(`
+                    UPDATE mainuserdata SET xlm = $1 WHERE username = $2`, 
+                    [result.rows[0].tiers[0] + userresult.rows[0].xlm, username])
+                    
+                    var update_arr = [parseInt(result.rows[0].tierscompleted[0]) + 1, parseInt(result.rows[0].tierscompleted[1])]
+                    var updateuserxlm = await pool.query(`
+                    UPDATE ads SET tierscompleted = $1 WHERE adid = $2`, 
+                    [update_arr, result.rows[0].adid])
+                }
+                else if(result.rows[0].tierscompleted[1] < result.rows[0].targetpeople[1]){
+                    var updateuserxlm = await pool.query(`
+                    UPDATE mainuserdata SET xlm = $1 WHERE username = $2`, 
+                    [result.rows[0].tiers[1] + userresult.rows[0].xlm, username])
+
+                    var update_arr = [parseInt(result.rows[0].tierscompleted[0]), parseInt(result.rows[0].tierscompleted[1]) + 1]
+                    console.log(update_arr)
+                    var updateuserxlm = await pool.query(`
+                    UPDATE ads SET tierscompleted = $1 WHERE adid = $2`, 
+                    [update_arr, result.rows[0].adid])
+                }
+            }
+        }
+        res.send("Done")
+        res.end()
+    }
+    queryurl()
+});
+
 app.get('/main/:username/:secret_hash', (req, res) => {
     const getUserData = async () => {
         var username = req.params.username;
