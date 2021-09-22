@@ -60,7 +60,7 @@ function generateUser(){
 app.set("view engine", "ejs");
 
 app.get('/', (req, res) => {
-    res.send("Welcome to Black Rhino")
+    res.send("WEEEEEEEEEE")
 });
 
 app.get('/checkurl/:username/:theurl', (req, res) => {
