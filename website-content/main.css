@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
+
+*{
+    font-family: 'Source Sans Pro', sans-serif;
+    letter-spacing: 2px;
+    background-color: rgb(18,18,18);
+}
+
+#header {
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 60px;
+    width: 98%;
+    background-color: rgb(187,134,252);
+    border-radius: 10px;
+}
+
+#black-rhino-icon {
+    position: relative;
+    top: 12px;
+    left: 20px;
+    height: 55px;
+    width: 55px;
+    background-color: rgb(235,235,235, 0);
+    border-radius: 10px;
+}
+
+#download {
+    position: relative;
+    bottom: 7px;
+    left: 50%;
+    display: inline-block;
+    color: white;
+    font-size: 1em;
+    letter-spacing: 1px;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+#download:hover {
+    cursor: pointer;
+    background-color: rgb(55,0,179);
+}
