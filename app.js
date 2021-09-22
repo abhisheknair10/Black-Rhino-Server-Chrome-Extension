@@ -59,6 +59,10 @@ function generateUser(){
 
 app.set("view engine", "ejs");
 
+app.get('/', (req, res) => {
+    res.send("Welcome to Black Rhino")
+});
+
 app.get('/checkurl/:username/:theurl', (req, res) => {
     const queryurl = async () => {
         var username = req.params.username
@@ -86,7 +90,7 @@ app.get('/checkurl/:username/:theurl', (req, res) => {
                     UPDATE mainuserdata SET xlm = $1 WHERE username = $2`, 
                     [result.rows[0].tiers[0] + userresult.rows[0].xlm, username])
                     
-                    var update_arr = [parseInt(result.rows[0].tierscompleted[0]) + 1, parseInt(result.rows[0].tierscompleted[1])]
+                    var update_arr = [parseInt(result.rows[0].tierscompleted[0]) + 1, parseInt(result.rows[0].tierscompleted[1]), parseInt(result.rows[0].tierscompleted[2])]
                     var updateuserxlm = await pool.query(`
                     UPDATE ads SET tierscompleted = $1 WHERE adid = $2`, 
                     [update_arr, result.rows[0].adid])
@@ -96,7 +100,18 @@ app.get('/checkurl/:username/:theurl', (req, res) => {
                     UPDATE mainuserdata SET xlm = $1 WHERE username = $2`, 
                     [result.rows[0].tiers[1] + userresult.rows[0].xlm, username])
 
-                    var update_arr = [parseInt(result.rows[0].tierscompleted[0]), parseInt(result.rows[0].tierscompleted[1]) + 1]
+                    var update_arr = [parseInt(result.rows[0].tierscompleted[0]), parseInt(result.rows[0].tierscompleted[1]) + 1, parseInt(result.rows[0].tierscompleted[2])]
+                    console.log(update_arr)
+                    var updateuserxlm = await pool.query(`
+                    UPDATE ads SET tierscompleted = $1 WHERE adid = $2`, 
+                    [update_arr, result.rows[0].adid])
+                }
+                else if(result.rows[0].tierscompleted[2] < result.rows[0].targetpeople[2]){
+                    var updateuserxlm = await pool.query(`
+                    UPDATE mainuserdata SET xlm = $1 WHERE username = $2`, 
+                    [result.rows[0].tiers[2] + userresult.rows[0].xlm, username])
+
+                    var update_arr = [parseInt(result.rows[0].tierscompleted[0]), parseInt(result.rows[0].tierscompleted[1]), parseInt(result.rows[0].tierscompleted[2]) + 1]
                     console.log(update_arr)
                     var updateuserxlm = await pool.query(`
                     UPDATE ads SET tierscompleted = $1 WHERE adid = $2`, 
