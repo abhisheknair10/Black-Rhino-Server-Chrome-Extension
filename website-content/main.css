@@ -8,10 +8,10 @@
 
 #header {
     position: absolute;
-    top: 50px;
+    top: 40px;
     left: 50%;
     transform: translate(-50%, -50%);
-    height: 60px;
+    height: 50px;
     width: 98%;
     background-color: rgb(187,134,252);
     border-radius: 10px;
@@ -20,26 +20,43 @@
 #black-rhino-icon {
     position: relative;
     top: 12px;
-    left: 20px;
-    height: 55px;
-    width: 55px;
+    left: 30px;
+    height: 40px;
+    width: 40px;
     background-color: rgb(235,235,235, 0);
     border-radius: 10px;
 }
 
-#download {
-    position: relative;
-    bottom: 7px;
-    left: 50%;
-    display: inline-block;
-    color: white;
-    font-size: 1em;
-    letter-spacing: 1px;
-    padding: 10px;
-    border-radius: 10px;
+.center {
+    top: 40px;
+    left: 95%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    width: 35px;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0);
+}
+  
+.center:before, .center:after, .center div {
+    background: #fff;
+    content: "";
+    display: block;
+    height: 3px;
+    border-radius: 3px;
+    margin: 7px 0;
+    transition: 0.5s;
 }
 
-#download:hover {
-    cursor: pointer;
-    background-color: rgb(55,0,179);
+.center:active:before {
+    transform: translateY(12px) rotate(135deg);
 }
+
+.center:active:after {
+    transform: translateY(-12px) rotate(-135deg);
+}
+
+.center:active div {
+    transform: scale(0);
+}
+  
+  

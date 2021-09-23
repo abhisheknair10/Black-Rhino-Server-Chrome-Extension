@@ -1,10 +1,12 @@
 const path = require('path')
 const express = require('express')
+const sha256 = require('js-sha256')
+const fs = require('fs')
+const { Pool } = require('pg')
+const nodemailer = require('nodemailer')
+
 const app = express()
 const port = process.env.PORT || 3000
-var sha256 = require('js-sha256')
-const fs = require("fs")
-const { Pool } = require('pg')
 
 //-----------------------------------------------------------------------------
 
@@ -25,7 +27,7 @@ pool.connect()
 //-----------------------------------------------------------------------------
 
 function financial(x) {
-    return Number.parseFloat(x).toFixed(2);
+    return Number.parseFloat(x).toFixed(5);
 }
 
 //-----------------------------------------------------------------------------
@@ -86,34 +88,34 @@ app.get('/checkurl/:username/:theurl', (req, res) => {
                 var appenddb = await pool.query(`
                 UPDATE mainuserdata SET ads = $1 WHERE username = $2;`, [appended_arr, username])
                 if(result.rows[0].tierscompleted[0] < result.rows[0].targetpeople[0]){
-                    var updateuserxlm = await pool.query(`
-                    UPDATE mainuserdata SET xlm = $1 WHERE username = $2`, 
-                    [result.rows[0].tiers[0] + userresult.rows[0].xlm, username])
+                    var updateuserbtc = await pool.query(`
+                    UPDATE mainuserdata SET btc = $1 WHERE username = $2`, 
+                    [result.rows[0].tiers[0] + userresult.rows[0].btc, username])
                     
                     var update_arr = [parseInt(result.rows[0].tierscompleted[0]) + 1, parseInt(result.rows[0].tierscompleted[1]), parseInt(result.rows[0].tierscompleted[2])]
-                    var updateuserxlm = await pool.query(`
+                    var updateuserbtc = await pool.query(`
                     UPDATE ads SET tierscompleted = $1 WHERE adid = $2`, 
                     [update_arr, result.rows[0].adid])
                 }
                 else if(result.rows[0].tierscompleted[1] < result.rows[0].targetpeople[1]){
-                    var updateuserxlm = await pool.query(`
-                    UPDATE mainuserdata SET xlm = $1 WHERE username = $2`, 
-                    [result.rows[0].tiers[1] + userresult.rows[0].xlm, username])
+                    var updateuserbtc = await pool.query(`
+                    UPDATE mainuserdata SET btc = $1 WHERE username = $2`, 
+                    [result.rows[0].tiers[1] + userresult.rows[0].btc, username])
 
                     var update_arr = [parseInt(result.rows[0].tierscompleted[0]), parseInt(result.rows[0].tierscompleted[1]) + 1, parseInt(result.rows[0].tierscompleted[2])]
                     console.log(update_arr)
-                    var updateuserxlm = await pool.query(`
+                    var updateuserbtc = await pool.query(`
                     UPDATE ads SET tierscompleted = $1 WHERE adid = $2`, 
                     [update_arr, result.rows[0].adid])
                 }
                 else if(result.rows[0].tierscompleted[2] < result.rows[0].targetpeople[2]){
-                    var updateuserxlm = await pool.query(`
-                    UPDATE mainuserdata SET xlm = $1 WHERE username = $2`, 
-                    [result.rows[0].tiers[2] + userresult.rows[0].xlm, username])
+                    var updateuserbtc = await pool.query(`
+                    UPDATE mainuserdata SET btc = $1 WHERE username = $2`, 
+                    [result.rows[0].tiers[2] + userresult.rows[0].btc, username])
 
                     var update_arr = [parseInt(result.rows[0].tierscompleted[0]), parseInt(result.rows[0].tierscompleted[1]), parseInt(result.rows[0].tierscompleted[2]) + 1]
                     console.log(update_arr)
-                    var updateuserxlm = await pool.query(`
+                    var updateuserbtc = await pool.query(`
                     UPDATE ads SET tierscompleted = $1 WHERE adid = $2`, 
                     [update_arr, result.rows[0].adid])
                 }
@@ -131,9 +133,9 @@ app.get('/main/:username/:secret_hash', (req, res) => {
         var secret_hash = req.params.secret_hash;
         var result = await pool.query(`SELECT * FROM mainuserdata WHERE username = $1;`, [username]);
         if(result.rows[0].shahash == secret_hash){
-            var xlm = financial(result.rows[0].xlm);
-            console.log(xlm)
-            res.send(xlm);
+            var btc = financial(result.rows[0].btc);
+            console.log(btc)
+            res.send(btc);
             res.end();
         }
         else{
@@ -144,17 +146,18 @@ app.get('/main/:username/:secret_hash', (req, res) => {
     getUserData()
 });
 
-app.get('/newuser/generateuser-request', (req, res) => {
+app.get('/newuser/generateuser-request/:email', (req, res) => {
     const connToDatabase = async () => {
         new_user = generateUser();
         new_username = new_user.split("<>")[0];
         new_secret_hash = new_user.split("<>")[1];
+        var email = req.params.email;
 
         var result = await pool.query(`SELECT * FROM mainuserdata WHERE username = $1;`, [new_username]);
         if(result.rows == ""){
             console.log("User Does Not Exists")
             console.log(result.rows);
-            var postToDatabase = await pool.query(`INSERT INTO mainuserdata VALUES ($1, $2, $3, $4);`, [new_username, new_secret_hash, 0.00, []]);
+            var postToDatabase = await pool.query(`INSERT INTO mainuserdata VALUES ($1, $2, $3, $4, $5);`, [new_username, new_secret_hash, 0.00, [], email]);
         }
         else{
             new_user = "userfound";
@@ -191,15 +194,16 @@ app.get('/recover/account/:username/:hash', (req, res) => {
     recoverAccount()
 });
 
-app.get('/withdraw/:username/:hash/:walletaddr/:amount', (req, res) => {
-    res.send("Ha")
+app.get('/withdraw/:username/:hash/:walletaddr', (req, res) => {
+    console.log(req.params.walletaddr)
+    res.send("sa")
     res.end()
 });
 
 app.get('/hints/:username', (req, res) => {
     const hints = async () => {
         var username = req.params.username;
-        var adsresult = await pool.query(`SELECT * FROM ads;`);
+        var adsresult = await pool.query(`SELECT * FROM ads ORDER BY adid DESC;`);
         var userresult = await pool.query(`SELECT * FROM mainuserdata WHERE username = $1`, [username]);
         var ret_array = []
         for (let i = 0; i < adsresult.rows.length; i++) {

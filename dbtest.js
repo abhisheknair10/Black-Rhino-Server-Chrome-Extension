@@ -1,30 +1,15 @@
-const { Pool } = require('pg')
-const fs = require("fs");
+const generateRandomNumber = (min, max) =>  {
+  return Math.floor(Math.random() * (max - min) + min);
+};
 
-const pool = new Pool({
-    user: 'doadmin',
-    host: 'black-rhino-cluster-do-user-9771361-0-5bd2.b.db.ondigitalocean.com',
-    database: 'defaultdb',
-    password: 'gIlTlPDrHR2BZkTF',
-    port: 25060,
-    ssl: {
-        rejectUnauthorized: true,
-        ca: fs.readFileSync("ca-certificate.crt").toString()
-    }
-})
-pool.connect()
+var i = 0;
+var num = 0;
+var non = 0;
 
-pool.query(`SELECT * FROM mainuserdata WHERE username = 'user10';`, (err, res)=>{
-    if(!err){
-        if(res.rows == ""){
-            console.log("User Does not Exist");
-        }
-        else{
-            console.log("User Exists")
-        }
+while(i < 5){
+    non = non + 1;
+    num = generateRandomNumber(1, 100);
+    if(num == 50){
+        i = i + 1;
     }
-    else {
-        console.log(err.message);
-    }
-    pool.end();
-})
+}
