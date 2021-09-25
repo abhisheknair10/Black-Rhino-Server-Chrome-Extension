@@ -1,15 +1,24 @@
-const generateRandomNumber = (min, max) =>  {
-  return Math.floor(Math.random() * (max - min) + min);
+var nodemailer = require('nodemailer');
+
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'blackrhino.ce@gmail.com',
+    pass: 'jerryboiiirussel'
+  }
+});
+
+var mailOptions = {
+  from: 'blackrhino.ce@gmail.com',
+  to: 'nairabs10@gmail.com',
+  subject: 'OTP - Black Rhino CE - Account Creation',
+  text: ''
 };
 
-var i = 0;
-var num = 0;
-var non = 0;
-
-while(i < 5){
-    non = non + 1;
-    num = generateRandomNumber(1, 100);
-    if(num == 50){
-        i = i + 1;
-    }
-}
+transporter.sendMail(mailOptions, function(error, info){
+  if (error) {
+    console.log(error);
+  } else {
+    console.log('Email sent: ' + info.response);
+  }
+});
