@@ -4,7 +4,7 @@ const sha256 = require('js-sha256')
 const fs = require('fs')
 const { Pool } = require('pg')
 const nodemailer = require('nodemailer')
-const coinbase = require('coinbase').Client
+//require send zcash library
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -27,21 +27,8 @@ pool.connect()
 
 //-----------------------------------------------------------------------------
 
-var coinbaseclient = new coinbase({
-    'apiKey': 'API KEY',
-    'apiSecret': 'API SECRET'
-})
-/*
-coinbaseclient.getAccount('hyperjuice101@gmail.com', function(err, account){
-    account.sendMoney({
-        'to': '',
-        'amount': '',
-        'currency': 'BTC'
-    }, function(err, tx){
-        console.log(tx);
-    });
-});
-*/
+
+
 //-----------------------------------------------------------------------------
 
 var transporter = nodemailer.createTransport({
@@ -117,34 +104,34 @@ app.get('/checkurl/:username/:theurl', (req, res) => {
                     var appenddb = await pool.query(`
                     UPDATE mainuserdata SET ads = $1 WHERE username = $2;`, [appended_arr, username])
                     if(result.rows[0].tierscompleted[0] < result.rows[0].targetpeople[0]){
-                        var updateuserbtc = await pool.query(`
-                        UPDATE mainuserdata SET btc = $1 WHERE username = $2`, 
-                        [result.rows[0].tiers[0] + userresult.rows[0].btc, username])
+                        var updateuserzcash = await pool.query(`
+                        UPDATE mainuserdata SET zcash = $1 WHERE username = $2`, 
+                        [result.rows[0].tiers[0] + userresult.rows[0].zcash, username])
                         
                         var update_arr = [parseInt(result.rows[0].tierscompleted[0]) + 1, parseInt(result.rows[0].tierscompleted[1]), parseInt(result.rows[0].tierscompleted[2])]
-                        var updateuserbtc = await pool.query(`
+                        var updateuserzcash = await pool.query(`
                         UPDATE ads SET tierscompleted = $1 WHERE adid = $2`, 
                         [update_arr, result.rows[0].adid])
                     }
                     else if(result.rows[0].tierscompleted[1] < result.rows[0].targetpeople[1]){
-                        var updateuserbtc = await pool.query(`
-                        UPDATE mainuserdata SET btc = $1 WHERE username = $2`, 
-                        [result.rows[0].tiers[1] + userresult.rows[0].btc, username])
+                        var updateuserzcash = await pool.query(`
+                        UPDATE mainuserdata SET zcash = $1 WHERE username = $2`, 
+                        [result.rows[0].tiers[1] + userresult.rows[0].zcash, username])
     
                         var update_arr = [parseInt(result.rows[0].tierscompleted[0]), parseInt(result.rows[0].tierscompleted[1]) + 1, parseInt(result.rows[0].tierscompleted[2])]
                         console.log(update_arr)
-                        var updateuserbtc = await pool.query(`
+                        var updateuserzcash = await pool.query(`
                         UPDATE ads SET tierscompleted = $1 WHERE adid = $2`, 
                         [update_arr, result.rows[0].adid])
                     }
                     else if(result.rows[0].tierscompleted[2] < result.rows[0].targetpeople[2]){
-                        var updateuserbtc = await pool.query(`
-                        UPDATE mainuserdata SET btc = $1 WHERE username = $2`, 
-                        [result.rows[0].tiers[2] + userresult.rows[0].btc, username])
+                        var updateuserzcash = await pool.query(`
+                        UPDATE mainuserdata SET zcash = $1 WHERE username = $2`, 
+                        [result.rows[0].tiers[2] + userresult.rows[0].zcash, username])
     
                         var update_arr = [parseInt(result.rows[0].tierscompleted[0]), parseInt(result.rows[0].tierscompleted[1]), parseInt(result.rows[0].tierscompleted[2]) + 1]
                         console.log(update_arr)
-                        var updateuserbtc = await pool.query(`
+                        var updateuserzcash = await pool.query(`
                         UPDATE ads SET tierscompleted = $1 WHERE adid = $2`, 
                         [update_arr, result.rows[0].adid])
                     }
@@ -163,9 +150,9 @@ app.get('/main/:username/:secret_hash', (req, res) => {
         var secret_hash = req.params.secret_hash;
         var result = await pool.query(`SELECT * FROM mainuserdata WHERE username = $1;`, [username]);
         if(result.rows[0].shahash == secret_hash){
-            var btc = financial(result.rows[0].btc);
-            console.log(btc)
-            res.send(btc);
+            var zcash = financial(result.rows[0].zcash);
+            console.log(zcash)
+            res.send(zcash);
             res.end();
         }
         else{
@@ -191,7 +178,7 @@ app.get('/newuser/generateuser-request/:email', (req, res) => {
 
         var result = await pool.query(`SELECT * FROM mainuserdata WHERE username = $1;`, [new_username]);
         var emailver = await pool.query(`SELECT * FROM mainuserdata WHERE emailaddr = $1;`, [email]);
-        if(result.rows == "" && emailver.rows == ""){
+        if(result.rows[0] == null && emailver.rows[0] == null){
             console.log("User Does Not Exists")
             console.log(result.rows);
             var postToDatabase = await pool.query(`INSERT INTO mainuserdata VALUES ($1, $2, $3, $4, $5, $6, $7);`, [new_username, new_secret_hash, 0.00, [], email, otphash, 0]);
@@ -211,7 +198,7 @@ app.get('/newuser/generateuser-request/:email', (req, res) => {
                 }
             });
         }
-        else if(emailver.rows == ""){
+        else if(emailver.rows[0] == null){
             new_user = "userfound";
             console.log("User Found")
         }
@@ -230,7 +217,7 @@ app.get('/verify/:otphash', (req, res) => {
     const verifyaccount = async () => {
         var otphash = req.params.otphash;
         var result = await pool.query(`SELECT * FROM mainuserdata WHERE otplink = $1;`, [otphash]);
-        if(result.rows != ""){
+        if(result.rows[0] != null){
             var updateverification = await pool.query(`UPDATE mainuserdata SET verified = $1 
             WHERE otplink = $2`, [1, otphash])
             res.send("Your Account has been Verified")
@@ -269,12 +256,54 @@ app.get('/recover/account/:username/:hash', (req, res) => {
 });
 
 app.get('/withdraw/:username/:hash/:walletaddr/:amount', (req, res) => {
-    walletaddr = req.params.walletaddr;
-    amount = req.params.amount;
-    console.log(walletaddr)
-    console.log(amount)
-    res.send("Done")
-    res.end()
+    const withdraw = async () => {
+        var username = req.params.username;
+        var hash = req.params.hash;
+        var walletaddr = req.params.walletaddr;
+        var amount = req.params.amount;
+        var retval = ""
+
+        var result = await pool.query(`SELECT * FROM mainuserdata WHERE username = $1`, [username]);
+        if(result.rows[0] != null){
+            if(result.rows[0].shahash == hash){
+                if(amount <= result.rows[0].zcash){
+                    // Send crypto
+                    var mailcontent = "Dear Black Rhino CE User,\n\n" + financial(amount) + " ZCASH has been transfered to " + walletaddr + ".\n\n Black Rhino CE"
+                    var mailOptions = {
+                        from: 'blackrhino.ce@gmail.com',
+                        to: result.rows[0].emailaddr,
+                        subject: 'Withdrawal Notification',
+                        text: mailcontent
+                    };
+                    transporter.sendMail(mailOptions, function(error, info){
+                        if (error) {
+                            console.log(error);
+                        } 
+                        else {
+                            console.log('Email sent: ' + info.response);
+                        }
+                    });
+                    retval = "sent-to-wallet"
+                    console.log("Sent To Wallet")
+                }
+                else{
+                    retval = "too-much-amount"
+                    console.log("Incorrect Amount")
+                }
+            }
+            else{
+                retval = "wrong-hash"
+                console.log("Wrong Hash")
+            }
+        }
+        else{
+            retval = "non-existent"
+            console.log("User Does not Exist")
+        }
+        res.send(retval)
+        res.end()
+    }
+    withdraw()
 });
 
 app.get('/hints/:username', (req, res) => {
