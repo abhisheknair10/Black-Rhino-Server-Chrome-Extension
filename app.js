@@ -4,7 +4,7 @@ const sha256 = require('js-sha256')
 const fs = require('fs')
 const { Pool } = require('pg')
 const nodemailer = require('nodemailer')
-//require send zcash library
+const CryptoAccount = require("send-crypto");
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -27,7 +27,7 @@ pool.connect()
 
 //-----------------------------------------------------------------------------
 
-
+// Send ZEC Function
 
 //-----------------------------------------------------------------------------
 
@@ -186,7 +186,7 @@ app.get('/newuser/generateuser-request/:email', (req, res) => {
             var mailOptions = {
                 from: 'blackrhino.ce@gmail.com',
                 to: 'nairabs10@gmail.com',
-                subject: 'OTP - Black Rhino CE - Account Creation',
+                subject: 'Verify - Black Rhino CE - Account Creation',
                 text: mailcontent
             };
             transporter.sendMail(mailOptions, function(error, info){
@@ -262,29 +262,25 @@ app.get('/withdraw/:username/:hash/:walletaddr/:amount', (req, res) => {
         var walletaddr = req.params.walletaddr;
         var amount = req.params.amount;
         var retval = ""
-
+        
         var result = await pool.query(`SELECT * FROM mainuserdata WHERE username = $1`, [username]);
         if(result.rows[0] != null){
             if(result.rows[0].shahash == hash){
                 if(amount <= result.rows[0].zcash){
-                    // Send crypto
-                    var mailcontent = "Dear Black Rhino CE User,\n\n" + financial(amount) + " ZCASH has been transfered to " + walletaddr + ".\n\n Black Rhino CE"
-                    var mailOptions = {
-                        from: 'blackrhino.ce@gmail.com',
-                        to: result.rows[0].emailaddr,
-                        subject: 'Withdrawal Notification',
-                        text: mailcontent
-                    };
-                    transporter.sendMail(mailOptions, function(error, info){
-                        if (error) {
-                            console.log(error);
-                        } 
-                        else {
-                            console.log('Email sent: ' + info.response);
-                        }
-                    });
-                    retval = "sent-to-wallet"
-                    console.log("Sent To Wallet")
+                    var checkwithreq = await pool.query(`SELECT * FROM withdrawrequests WHERE username = $1`, [username]);
+                    if(checkwithreq.rows[0] == null){
+                        var userdata = await pool.query(`SELECT * FROM mainuserdata WHERE username = $1`, [username])
+                        var remainingamount = userdata.rows[0].zcash - amount
+                        var updatezcash = await pool.query(`UPDATE mainuserdata SET zcash = $1 
+                        WHERE username = $2`, [remainingamount, username])
+                        var postToDatabase = await pool.query(`INSERT INTO withdrawrequests VALUES ($1, $2, $3, $4, $5);`, [username, hash, amount, walletaddr, userdata.rows[0].emailaddr]);
+                        retval = "sent-to-wallet"
+                        console.log("Sent To Wallet")
+                    }
+                    else{
+                        retval = "request-already-there"
+                        console.log("Withdraw Request Already Exists")
+                    }
                 }
                 else{
                     retval = "too-much-amount"
