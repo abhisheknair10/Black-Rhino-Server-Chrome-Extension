@@ -38,7 +38,7 @@ function financial(x) {
 //------------------------------------------------------------------------------------
 
 
-const withdraw = async () => {
+async function withdraw(){
     var query = await client.query(`SELECT * FROM withdrawrequests LIMIT 1;`)
     result = query.rows[0]
     if(result != null){
@@ -78,10 +78,14 @@ const withdraw = async () => {
         var account = new CryptoAccount(privateKey);
         console.log('No Requests. Balance: ZEC ' + await account.getBalance("ZEC"))
     }
-    await client.end()
 };
 
-withdraw()
+async function forever(){
+    while(true){
+        await withdraw()
+    }    
+}
 
+forever()
 
 //------------------------------------------------------------------------------------
