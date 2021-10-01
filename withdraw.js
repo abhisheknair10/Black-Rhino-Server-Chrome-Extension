@@ -40,8 +40,7 @@ function financial(x) {
 
 async function withdraw(){
     var query = await client.query(`SELECT * FROM withdrawrequests LIMIT 1;`)
-    result = query.rows[0]
-    if(result != null){
+    if(query.rows[0] != null){
         var privateKey = "beaa9540abe34f4b97c751d1283d66a86073bd9b460365a07b0aaa3e259a840b";
         var account = new CryptoAccount(privateKey);
         //t1MDPgTFbgS5TyRsJjFVh3c7JHAUJv5iwJZ
@@ -49,29 +48,34 @@ async function withdraw(){
         //console.log(await account.address("ZEC"));
         //console.log(await account.getBalance("ZEC"));
 
-        await account.send(
-            result.walletaddr, 
-            result.zwith, 
-            "ZEC", 
-            {subtractFee: true}
-        ).on("transactionHash", console.log).on("confirmation", console.log);
-
-        var mailcontent = "Dear Black Rhino CE User,\n\n" + financial(result.zwith) + " ZCASH has been transfered to " + result.walletaddr + ".\n\n Black Rhino CE"
-        var mailOptions = {
-            from: 'blackrhino.ce@gmail.com',
-            to: result.emailaddr,
-            subject: 'Withdrawal Notification',
-            text: mailcontent
-        };
-        transporter.sendMail(mailOptions, function(error, info){
-            if (error) {
-                console.log(error);
-            } 
-            else {
-                console.log('Email sent: ' + info.response);
-            }
-        });
-        var query2 = await client.query(`DELETE FROM withdrawrequests WHERE username = $1;`, [result.username])
+        if(await account.getBalance("ZEC") - query.rows[0].zwith >= 0){
+            await account.send(
+                query.rows[0].walletaddr, 
+                query.rows[0].zwith, 
+                "ZEC", 
+                {subtractFee: true}
+            ).on("transactionHash", console.log).on("confirmation", console.log);
+    
+            var mailcontent = "Dear Black Rhino CE User,\n\n" + financial(query.rows[0].zwith) + " ZCASH has been transfered to a wallet with address: " + query.rows[0].walletaddr + "\n\n Black Rhino CE"
+            var mailOptions = {
+                from: 'blackrhino.ce@gmail.com',
+                to: query.rows[0].emailaddr,
+                subject: 'Withdrawal Notification',
+                text: mailcontent
+            };
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                    console.log(error);
+                } 
+                else {
+                    console.log('Email sent: ' + info.response);
+                }
+            });
+            var query2 = await client.query(`DELETE FROM withdrawrequests WHERE username = $1;`, [query.rows[0].username])    
+        }
+        else{
+            console.log("Not Enough Funds")
+        }
     }
     else{
         var privateKey = "beaa9540abe34f4b97c751d1283d66a86073bd9b460365a07b0aaa3e259a840b";
