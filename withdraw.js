@@ -3,7 +3,7 @@ const express = require('express')
 const fs = require('fs')
 const { Client } = require('pg')
 const nodemailer = require('nodemailer')
-const CryptoAccount = require("send-crypto");
+const CryptoAccount = require("send-crypto")
 
 //------------------------------------------------------------------------------------
 
@@ -23,11 +23,14 @@ client.connect()
 
 //------------------------------------------------------------------------------------
 
-var transporter = nodemailer.createTransport({
-    service: 'gmail',
+var transporter = nodemailer.createTransport({    
+    service: 'Godaddy',
+    host: "smtpout.secureserver.net",  
+    secureConnection: true,
+    port: 465,
     auth: {
-        user: 'blackrhino.ce@gmail.com',
-        pass: 'jerryboiiirussel'
+        user: "info@blackrhino-ce.com",
+        pass: "jerryboiiirussel" 
     }
 });
 
@@ -58,7 +61,7 @@ async function withdraw(){
     
             var mailcontent = "Dear Black Rhino CE User,\n\n" + financial(query.rows[0].zwith) + " ZCASH has been transfered to a wallet with address: " + query.rows[0].walletaddr + "\n\n Black Rhino CE"
             var mailOptions = {
-                from: 'blackrhino.ce@gmail.com',
+                from: '"Black Rhino CE" <info@blackrhino-ce.com>',
                 to: query.rows[0].emailaddr,
                 subject: 'Withdrawal Notification',
                 text: mailcontent

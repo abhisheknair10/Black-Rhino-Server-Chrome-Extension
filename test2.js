@@ -1,80 +1,32 @@
-const bitcore = require('bitcore-lib')
-const axios = require("axios")
+var nodemailer = require('nodemailer');
 
-var sendzec = async (recieverAddress, amountToSend) => {
-    var sochain_network = "ZEC";
-    var privateKey = "KyodbZ4GCAVNJhjmmxiD76Rmfi2GBxWVrGKZZxRcg6KTtvK5t9U4"; //Enter Private Key
-    var sourceAddress = "t1MRwrY7TBF692A33V5NF3dtkQEc1DEAsgt";
-    let fee = 0.0001;
-    let inputCount = 0;
-    let outputCount = 2;
-
-    var utxos = await axios.get(
-        `https://sochain.com/api/v2/get_tx_unspent/${sochain_network}/${sourceAddress}`
-    );
-
-    var transaction = new bitcore.Transaction();
-    let totalAmountAvailable = 0;
-  
-    let inputs = [];
-    utxos.data.data.txs.forEach(async (element) => {
-        let utxo = {};
-
-        utxo.txId = element.txid;
-        utxo.output_no = element.output_no;
-        utxo.script_asm = element.script_asm;
-        utxo.script_hex = element.script_hex;
-        utxo.value = parseFloat(element.value).toFixed(5);
-        //utxo.address = utxos.data.data.address;
-        utxo.confirmations = element.confirmations;
-        
-        totalAmountAvailable += utxo.value;
-        inputCount += 1;
-        inputs.push(utxo);
-    });
-
-    console.log(inputs)
-    console.log(totalAmountAvailable)
-    console.log(totalAmountAvailable - fee)
-
-    if((totalAmountAvailable - amountToSend - fee) >= 0){
-        //Set transaction input
-        console.log("Inputs")
-        transaction.from(inputs);
-        console.log("Inputs")
-    
-        // set the recieving address and the amount to send
-        transaction.to(recieverAddress, amountToSend - fee);
-        console.log("Set Recieving Address and Amount to Send")
-    
-        // Set change address - Address to receive the left over funds after transfer
-        transaction.change(sourceAddress);
-        console.log("Source Address")
-
-        // Set fees
-        transaction.fee(fee);
-    
-        // Sign transaction with your private key
-        transaction.sign(privateKey);
-        console.log("Signed")
-    
-        // serialize Transactions
-        var serializedTransaction = transaction.serialize();
-        // Send transaction
-        var result = await axios({
-            method: "POST",
-            url: `https://sochain.com/api/v2/send_tx/${sochain_network}`,
-            data: {
-                tx_hex: serializedTransaction,
-            },
-        });
-        console.log(result.data.data)
-        console.log("Sending Money...")
-        return result.data.data;
+// Create the transporter with the required configuration for Outlook
+// change the user and pass !
+var transporter = nodemailer.createTransport({    
+    service: 'Godaddy',
+    host: "smtpout.secureserver.net",  
+    secureConnection: true,
+    port: 465,
+    auth: {
+        user: "info@blackrhino-ce.com",
+        pass: "jerryboiiirussel" 
     }
-    else{
-        console.log("Low Funds")
-    }
+});
+
+// setup e-mail data, even with unicode symbols
+var mailOptions = {
+    from: '"Black Rhino CE" <info@blackrhino-ce.com>', // sender address (who sends)
+    to: 'nairabs10@gmail.com', // list of receivers (who receives)
+    subject: 'Hello ', // Subject line
+    text: 'Hello world ', // plaintext body
+    html: '<b>Hello world </b><br> This is the first email sent with Nodemailer in Node.js' // html body
 };
 
-var transaction = sendzec("t1Unz8V36EZ8cLfs7AuHEHjpxACzDBAygE5", 0.002);
+// send mail with defined transport object
+transporter.sendMail(mailOptions, function(error, info){
+    if(error){
+        return console.log(error);
+    }
+
+    console.log('Message sent: ' + info.response);
+});

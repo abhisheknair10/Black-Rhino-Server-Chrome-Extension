@@ -9,6 +9,10 @@ const CryptoAccount = require("send-crypto");
 const app = express()
 const port = process.env.PORT || 3000
 
+const { promisify } = require('util');
+
+const readFile = promisify(fs.readFile);
+
 //-----------------------------------------------------------------------------
 
 const pool = new Pool({
@@ -31,11 +35,14 @@ pool.connect()
 
 //-----------------------------------------------------------------------------
 
-var transporter = nodemailer.createTransport({
-    service: 'gmail',
+var transporter = nodemailer.createTransport({    
+    service: 'Godaddy',
+    host: "smtpout.secureserver.net",  
+    secureConnection: true,
+    port: 465,
     auth: {
-        user: 'blackrhino.ce@gmail.com',
-        pass: 'jerryboiiirussel'
+        user: "info@blackrhino-ce.com",
+        pass: "jerryboiiirussel" 
     }
 });
 
@@ -188,12 +195,11 @@ app.get('/newuser/generateuser-request/:email/:country', (req, res) => {
             console.log("User Does Not Exists")
             console.log(result.rows);
             var postToDatabase = await pool.query(`INSERT INTO mainuserdata VALUES ($1, $2, $3, $4, $5, $6, $7, $8);`, [new_username, new_secret_hash, 0.00, [], email, otphash, 0, country]);
-            var mailcontent = 'Dear Black Rhino CE User,\n\nPlease click the link below to verify your account to start earning from Black Rhino CE.\n\n' + 'blackrhino-ce.com/verify/' + otphash + "\n\nBlack Rhino CE"
             var mailOptions = {
-                from: 'blackrhino.ce@gmail.com',
-                to: 'nairabs10@gmail.com',
+                from: '"Black Rhino CE" <info@blackrhino-ce.com>',
+                to: email,
                 subject: 'Verify - Black Rhino CE - Account Creation',
-                text: mailcontent
+                text: await readFile('htmlcontent/verifymail.html', 'utf8')
             };
             transporter.sendMail(mailOptions, function(error, info){
                 if (error) {
