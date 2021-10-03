@@ -10,15 +10,44 @@
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon/16x16.png">
         <link rel="manifest" href="/favicon/site.webmanifest">
     </head>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
+
+        *{
+            font-family: 'Source Sans Pro', sans-serif;
+            letter-spacing: 2px;
+            background-color: rgb(25, 25, 25);
+        }
+
+        #black-rhino-icon {
+            position: absolute;
+            top: 100px;
+            left: 80%;
+            transform: translate(-50%, 0%);
+            height: 500px;
+            width: 500px;
+            background-color: rgb(235,235,235, 0);
+            border-radius: 10px;
+        }
+
+        #caution {
+            position: absolute;
+            top: 230px;
+            left: 10%;
+            color: white;
+            font-size: 6em;
+            width: 300px;
+            background: rgb(0,0,0,0);
+        }
+
+    </style>
     <body>
         <div>
-            <div id = "header"></div>
             <img id = "black-rhino-icon" src = "/black-rhino-icon.png" alt = "img">
-            <div class="center">
-                <div></div>
-            </div>
+            <div id = "caution">Still in the works...</div>
         </div>
-        <script src = "/website-content/main.js"></script>
-        <link rel="stylesheet" href="/website-content/main.css">
+        <script>
+            console.log("Hello World")
+        </script>
     </body>
 </html>

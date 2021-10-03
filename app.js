@@ -84,7 +84,8 @@ function generateUser(){
 app.set("view engine", "ejs");
 
 app.get('/', (req, res) => {
-    res.send("WEEEEEEEEEE")
+    console.log('Site Requested')
+    res.sendFile(path.join(__dirname + '/website-content/main.html'))
 });
 
 app.get('/checkurl/:username/:theurl', (req, res) => {
