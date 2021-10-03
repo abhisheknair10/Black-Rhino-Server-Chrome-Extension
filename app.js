@@ -7,6 +7,7 @@ const nodemailer = require('nodemailer')
 const CryptoAccount = require("send-crypto");
 
 const app = express()
+const router = express.Router();
 app.use(express.static(__dirname));
 const port = process.env.PORT || 3000
 
@@ -151,8 +152,7 @@ app.get('/checkurl/:username/:theurl', (req, res) => {
                 }
             }
         }
-        res.send(userresult.rows[0].verified+"")
-        res.end()
+        res.send(userresult.rows[0].verified+"")   
     }
     queryurl()
 });
@@ -166,11 +166,10 @@ app.get('/main/:username/:secret_hash', (req, res) => {
             var zcash = financial(result.rows[0].zcash);
             console.log(zcash)
             res.send(zcash);
-            res.end();
+            ;
         }
         else{
             res.send("ID Not Validated");
-            res.end();
         }
     }
     getUserData()
@@ -222,7 +221,6 @@ app.get('/newuser/generateuser-request/:email/:country', (req, res) => {
         }
         console.log("Sending")
         res.send(new_user);
-        res.end();
     }
     connToDatabase()
 });
@@ -234,202 +232,10 @@ app.get('/verify/:otphash', (req, res) => {
         if(result.rows[0] != null){
             var updateverification = await pool.query(`UPDATE mainuserdata SET verified = $1 
             WHERE otplink = $2`, [1, otphash])
-            res.send(`
-                <!DOCTYPE html>
-                <html lang="en">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>Black Rhino CE</title>
-                        <link rel="icon" type="image/png" sizes="180x180" href="/favicon/apple-touch-icon.png">
-                        <link rel="icon" type="image/png" sizes="32x32" href="/favicon/32x32.png">
-                        <link rel="icon" type="image/png" sizes="16x16" href="/favicon/16x16.png">
-                        <link rel="manifest" href="/favicon/site.webmanifest">
-                    </head>
-                    <style>
-                        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
-                        *{
-                            font-family: 'Source Sans Pro', sans-serif;
-                            letter-spacing: 2px;
-                            background-color: rgb(25,25,25);
-                        }
-
-                        #black-rhino-icon {
-                            position: relative;
-                            left: 50%;
-                            transform: translate(-50%, -50%);
-                            top: 180px;
-                            height: 250px;
-                            width: 250px;
-                            background-color: rgb(235,235,235, 0);
-                            border-radius: 10px;
-                        }
-
-                        #black-rhino-ce {
-                            position: relative;
-                            top: 150px;
-                            font-size: 3.5em;
-                            letter-spacing: 1px;
-                            font-weight: 500;
-                            left: 50%;
-                            width: 700px;
-                            transform: translate(-50%, -50%);
-                            text-align: center;
-                            background-color: rgb(0,0,0,0);
-                            color: white;
-                        }
-
-                        #text {
-                            position: relative;
-                            top: 250px;
-                            font-size: 1.5em;
-                            letter-spacing: 1px;
-                            left: 50%;
-                            width: 700px;
-                            transform: translate(-50%, -50%);
-                            text-align: center;
-                            background-color: rgb(0,0,0,0);
-                            color: rgb(187,134,252);
-                        }
-
-                        #text2 {
-                            position: relative;
-                            top: 280px;
-                            font-size: 1.1em;
-                            letter-spacing: 1px;
-                            left: 50%;
-                            width: 700px;
-                            transform: translate(-50%, -50%);
-                            text-align: center;
-                            background-color: rgb(0,0,0,0);
-                            color: rgb(187,134,252);
-                        }
-
-                        #verify{
-                            position: relative;
-                            margin: auto;
-                            top: 150px;
-                            width: 130px;
-                            padding: 20px;
-                            background: rgb(187,134,252);
-                            text-align: center;
-                            font-size: 1.5em;
-                            border-radius: 10px;
-                            border: 2px solid rgb(25,25,25);
-                            color: black;
-                        }
-
-                        #verify:hover {
-                            background-color: rgb(246,190,0);
-                            cursor: pointer;
-                            transition: background-color 0.5s;
-                        }
-
-                    </style>
-                    <body>
-                        <div>
-                            <img id = "black-rhino-icon" src = "/black-rhino-icon.png" alt = "img">
-                            <div id = "black-rhino-ce">Black Rhino CE</div>
-                            <div id = "text">Your Account has been Verified</div>
-                            <div id = "text2">You can now start earning Zcash by viewing Advertised Websites on Black Rhino CE</div>
-                        </div>
-                    </body>
-                </html>
-            `)
-            res.end()
+            res.sendFile(path.join(__dirname + '/verified.html'))
         }
         else{
-            res.send(`
-                <!DOCTYPE html>
-                <html lang="en">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>Black Rhino CE</title>
-                        <link rel="icon" type="image/png" sizes="180x180" href="/favicon/apple-touch-icon.png">
-                        <link rel="icon" type="image/png" sizes="32x32" href="/favicon/32x32.png">
-                        <link rel="icon" type="image/png" sizes="16x16" href="/favicon/16x16.png">
-                        <link rel="manifest" href="/favicon/site.webmanifest">
-                    </head>
-                    <style>
-                        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
-                        *{
-                            font-family: 'Source Sans Pro', sans-serif;
-                            letter-spacing: 2px;
-                            background-color: rgb(25,25,25);
-                        }
-
-                        #black-rhino-icon {
-                            position: relative;
-                            left: 50%;
-                            transform: translate(-50%, -50%);
-                            top: 180px;
-                            height: 250px;
-                            width: 250px;
-                            background-color: rgb(235,235,235, 0);
-                            border-radius: 10px;
-                        }
-
-                        #black-rhino-ce {
-                            position: relative;
-                            top: 150px;
-                            font-size: 3.5em;
-                            letter-spacing: 1px;
-                            font-weight: 500;
-                            left: 50%;
-                            width: 700px;
-                            transform: translate(-50%, -50%);
-                            text-align: center;
-                            background-color: rgb(0,0,0,0);
-                            color: white;
-                        }
-
-                        #text {
-                            position: relative;
-                            top: 250px;
-                            font-size: 1.5em;
-                            letter-spacing: 1px;
-                            left: 50%;
-                            width: 700px;
-                            transform: translate(-50%, -50%);
-                            text-align: center;
-                            background-color: rgb(0,0,0,0);
-                            color: rgb(207,102,121);
-                        }
-
-                        #verify{
-                            position: relative;
-                            margin: auto;
-                            top: 150px;
-                            width: 130px;
-                            padding: 20px;
-                            background: rgb(187,134,252);
-                            text-align: center;
-                            font-size: 1.5em;
-                            border-radius: 10px;
-                            border: 2px solid rgb(25,25,25);
-                            color: black;
-                        }
-
-                        #verify:hover {
-                            background-color: rgb(246,190,0);
-                            cursor: pointer;
-                            transition: background-color 0.5s;
-                        }
-
-                    </style>
-                    <body>
-                        <div>
-                            <img id = "black-rhino-icon" src = "/black-rhino-icon.png" alt = "img">
-                            <div id = "black-rhino-ce">Black Rhino CE</div>
-                            <div id = "text">Invalid Verification Link</div>
-                        </div>
-                    </body>
-                </html>
-            `)
-            res.end()
+            res.sendFile(path.join(__dirname + '/unverified.html'))
         }
     }
     verifyaccount()
@@ -444,7 +250,7 @@ app.get('/recover/account/:username/:hash', (req, res) => {
         try{
             if(secret_hash == result.rows[0].shahash){
                 res.send("200");
-                res.end();
+                ;
             }
             else{
                 res.send("1000");
@@ -453,7 +259,6 @@ app.get('/recover/account/:username/:hash', (req, res) => {
         catch(error){
             console.log(error)
             res.send("1000");
-            res.end();
         }
     }
     recoverAccount()
@@ -501,7 +306,6 @@ app.get('/withdraw/:username/:hash/:walletaddr/:amount', (req, res) => {
             console.log("User Does not Exist")
         }
         res.send(retval)
-        res.end()
     }
     withdraw()
 });
@@ -524,7 +328,6 @@ app.get('/hints/:username', (req, res) => {
         }
         console.log(ret_array)
         res.send(ret_array.join(''))
-        res.end()
     }
     hints()
 });
