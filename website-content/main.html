@@ -15,39 +15,73 @@
 
         *{
             font-family: 'Source Sans Pro', sans-serif;
-            letter-spacing: 2px;
-            background-color: rgb(25, 25, 25);
+            letter-spacing: 1px;
+            background-color: rgb(10, 10, 10);
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+            -o-user-select: none;
+            user-select: none;
         }
 
-        #black-rhino-icon {
-            position: absolute;
-            top: 100px;
-            left: 80%;
+        .main-div{
+            position: relative;
+            width: 99%;
+            left: 50%;
             transform: translate(-50%, 0%);
-            height: 500px;
-            width: 500px;
-            background-color: rgb(235,235,235, 0);
+            height: 550px;
+            background-color: rgb(20, 20, 20);
             border-radius: 10px;
         }
 
-        #caution {
-            position: absolute;
-            top: 230px;
-            left: 10%;
+        #black-rhino-icon {
+            position: relative;
+            top: 100px;
+            left: 80%;
+            transform: translate(-50%, 0%);
+            height: 400px;
+            width: 400px;
+            background-color: rgb(235, 235, 235, 0);
+            border-radius: 10px;
+        }
+
+        #main-title {
+            position: relative;
+            bottom: 200px;
+            left: 5%;
             color: white;
             font-size: 6em;
-            width: 300px;
-            background: rgb(0,0,0,0);
+            width: 800px;
+            background: rgb(0, 0, 0, 0);
+            text-align: center;
+        }
+
+        #browse {
+            position: relative;
+            bottom: 170px;
+            left: 5%;
+            color: #fbc403;
+            font-size: 2em;
+            width: 800px;
+            background: rgb(0, 0, 0, 0);
+            text-align: center;
+        }
+
+        #scroll {
+            position: relative;
+            top: 500px;
+            color: white;
         }
 
     </style>
     <body>
-        <div>
+        <div class = "main-div">
             <img id = "black-rhino-icon" src = "/black-rhino-icon.png" alt = "img">
-            <div id = "caution">Still in the works...</div>
+            <div id = "main-title">Black Rhino CE</div>
+            <div id = "browse">Browse the Internet and Earn Zcash</div>
         </div>
-        <script>
-            console.log("Hello World")
-        </script>
+        <div>
+            <div id = "scroll"></div>
+        </div>
     </body>
 </html>
