@@ -106,50 +106,52 @@ app.get('/checkurl/:username/:theurl', (req, res) => {
             else{
                 console.log("This Website is Advertised on Black Rhino")
                 returnval = 1;
-                if(result.rows[0].regions.includes(userresult.rows[0].country)){
-                    if(userresult.rows[0].ads.includes(result.rows[0].adid)){
+                if(result.rows[0].tierscompleted[2] < result.rows[0].targetpeople[2]){
+                    if(result.rows[0].regions.includes(userresult.rows[0].country)){
+                        if(userresult.rows[0].ads.includes(result.rows[0].adid)){
+                        }
+                        else{
+                            appended_arr = userresult.rows[0].ads
+                            appended_arr.push(result.rows[0].adid)
+                            var appenddb = await pool.query(`
+                            UPDATE mainuserdata SET ads = $1 WHERE username = $2;`, [appended_arr, username])
+                            if(result.rows[0].tierscompleted[0] < result.rows[0].targetpeople[0]){
+                                var updateuserzcash = await pool.query(`
+                                UPDATE mainuserdata SET zcash = $1 WHERE username = $2`, 
+                                [result.rows[0].tiers[0] + userresult.rows[0].zcash, username])
+                                
+                                var update_arr = [parseInt(result.rows[0].tierscompleted[0]) + 1, parseInt(result.rows[0].tierscompleted[1]), parseInt(result.rows[0].tierscompleted[2])]
+                                var updateuserzcash = await pool.query(`
+                                UPDATE ads SET tierscompleted = $1 WHERE adid = $2`, 
+                                [update_arr, result.rows[0].adid])
+                            }
+                            else if(result.rows[0].tierscompleted[1] < result.rows[0].targetpeople[1]){
+                                var updateuserzcash = await pool.query(`
+                                UPDATE mainuserdata SET zcash = $1 WHERE username = $2`, 
+                                [result.rows[0].tiers[1] + userresult.rows[0].zcash, username])
+            
+                                var update_arr = [parseInt(result.rows[0].tierscompleted[0]), parseInt(result.rows[0].tierscompleted[1]) + 1, parseInt(result.rows[0].tierscompleted[2])]
+                                console.log(update_arr)
+                                var updateuserzcash = await pool.query(`
+                                UPDATE ads SET tierscompleted = $1 WHERE adid = $2`, 
+                                [update_arr, result.rows[0].adid])
+                            }
+                            else if(result.rows[0].tierscompleted[2] < result.rows[0].targetpeople[2]){
+                                var updateuserzcash = await pool.query(`
+                                UPDATE mainuserdata SET zcash = $1 WHERE username = $2`, 
+                                [result.rows[0].tiers[2] + userresult.rows[0].zcash, username])
+            
+                                var update_arr = [parseInt(result.rows[0].tierscompleted[0]), parseInt(result.rows[0].tierscompleted[1]), parseInt(result.rows[0].tierscompleted[2]) + 1]
+                                console.log(update_arr)
+                                var updateuserzcash = await pool.query(`
+                                UPDATE ads SET tierscompleted = $1 WHERE adid = $2`, 
+                                [update_arr, result.rows[0].adid])
+                            }
+                        }
                     }
                     else{
-                        appended_arr = userresult.rows[0].ads
-                        appended_arr.push(result.rows[0].adid)
-                        var appenddb = await pool.query(`
-                        UPDATE mainuserdata SET ads = $1 WHERE username = $2;`, [appended_arr, username])
-                        if(result.rows[0].tierscompleted[0] < result.rows[0].targetpeople[0]){
-                            var updateuserzcash = await pool.query(`
-                            UPDATE mainuserdata SET zcash = $1 WHERE username = $2`, 
-                            [result.rows[0].tiers[0] + userresult.rows[0].zcash, username])
-                            
-                            var update_arr = [parseInt(result.rows[0].tierscompleted[0]) + 1, parseInt(result.rows[0].tierscompleted[1]), parseInt(result.rows[0].tierscompleted[2])]
-                            var updateuserzcash = await pool.query(`
-                            UPDATE ads SET tierscompleted = $1 WHERE adid = $2`, 
-                            [update_arr, result.rows[0].adid])
-                        }
-                        else if(result.rows[0].tierscompleted[1] < result.rows[0].targetpeople[1]){
-                            var updateuserzcash = await pool.query(`
-                            UPDATE mainuserdata SET zcash = $1 WHERE username = $2`, 
-                            [result.rows[0].tiers[1] + userresult.rows[0].zcash, username])
-        
-                            var update_arr = [parseInt(result.rows[0].tierscompleted[0]), parseInt(result.rows[0].tierscompleted[1]) + 1, parseInt(result.rows[0].tierscompleted[2])]
-                            console.log(update_arr)
-                            var updateuserzcash = await pool.query(`
-                            UPDATE ads SET tierscompleted = $1 WHERE adid = $2`, 
-                            [update_arr, result.rows[0].adid])
-                        }
-                        else if(result.rows[0].tierscompleted[2] < result.rows[0].targetpeople[2]){
-                            var updateuserzcash = await pool.query(`
-                            UPDATE mainuserdata SET zcash = $1 WHERE username = $2`, 
-                            [result.rows[0].tiers[2] + userresult.rows[0].zcash, username])
-        
-                            var update_arr = [parseInt(result.rows[0].tierscompleted[0]), parseInt(result.rows[0].tierscompleted[1]), parseInt(result.rows[0].tierscompleted[2]) + 1]
-                            console.log(update_arr)
-                            var updateuserzcash = await pool.query(`
-                            UPDATE ads SET tierscompleted = $1 WHERE adid = $2`, 
-                            [update_arr, result.rows[0].adid])
-                        }
+                        console.log("Not Supported Region")
                     }
-                }
-                else{
-                    console.log("Not Supported Region")
                 }
             }
         }
